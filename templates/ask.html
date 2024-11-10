@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+
+{% block header %}
+    {% include "layouts/registered.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="title-bar">
+        <h1>New Question</h1>
+    </div>
+
+    <div class="error-message">
+        Sorry, not all fields are filled out
+    </div>
+
+    <article class="title-form">
+        <label>Title</label>
+        <div class="info-input">
+            <input class="form-control" placeholder="Enter title here..." maxlength="120">
+        </div>                    
+    </article>
+    
+    <article class="text-form">
+        <label>Text</label>
+        <div class="info-input">
+            <textarea class="form-control" rows="20" placeholder="Enter your text here..."></textarea>
+        </div>
+    </article>
+    
+    <article class="tags-form">
+        <label>Tags</label>
+        <div class="info-input">
+            <input class="form-control" placeholder="Enter tags here..."maxlength="120">
+        </div>
+    </article>
+
+    <div class="ask-button-area">
+        <button class="submit-button">ASK!</button>
+    </div>        
+
+{% endblock %}

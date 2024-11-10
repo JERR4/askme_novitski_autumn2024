@@ -1,0 +1,38 @@
+{% extends 'layouts/base.html' %}
+
+{% block header %}
+    {% include "layouts/unregistered.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="title-bar">
+        <h1>Registration</h1>
+    </div>
+
+    <div class="error-message">
+        Sorry, this email address has already been registered
+    </div>
+
+    <div class="user-details-form">
+        <div class="labels">
+            <label>Login</label>
+            <label>Email</label>
+            <label>NickName</label>
+            <label>Passwors</label>
+            <label>Repeat password</label>
+            <label>Upload avatar</label>
+        </div>
+
+        <div class="info-input">
+            <input class="user-form-control" placeholder="Enter login" maxlength="30">
+            <input class="user-form-control" placeholder="Enter email" maxlength="320">
+            <input class="user-form-control" placeholder="Enter nickname" maxlength="30">
+            <input class="user-form-control" type="password" placeholder="Enter password..." maxlength="30">
+            <input class="user-form-control" type="password" placeholder="Confirm password..." maxlength="30">                      
+            <input class="file-choice" type="file" placeholder="choose"></input>
+            <button class="submit-button">Register!</button>
+        </div>      
+    </div>
+
+{% endblock %}

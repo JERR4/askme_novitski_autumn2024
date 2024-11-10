@@ -1,0 +1,52 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block header %}
+    {% include "layouts/registered.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <article class="question">
+        <div class="question-left">
+            <img src="{% static 'images/moon.png' %}" alt="Image" class="question-image">
+            <input type="number" class="form-control card-likes" value="5" min="0">
+        </div>
+    
+        <div class="question-right">
+            <div class="question-right-content">
+                <h1>{{question.title}}</h1>
+    
+                <div class="question-text">{{question.text}}</div>
+            </div>
+    
+            <div class="card-right-bottom">
+    
+                <div class="card-tags">
+                    Tags: 
+                    <a href="{% url 'tag_view' 'black-jack' %}">black-jack</a>
+                    <a href="{% url 'tag_view' 'bender' %}">bender</a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <hr>    
+
+    {% for answer in answers %}
+        {% include 'components/answer_card.html' %}
+    {% endfor %}
+
+    {% include 'components/pagination.html' %}
+
+    <hr>
+
+    <article class="answer">
+        <div class="text-input">
+            <textarea class="form-control" rows="6" placeholder="Enter your answer here..."></textarea>
+        </div>
+        <button class="submit-button">Answer</button>
+    </article>
+
+{% endblock %}

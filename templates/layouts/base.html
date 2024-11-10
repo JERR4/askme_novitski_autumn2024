@@ -1,0 +1,75 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <a href="{% url 'index' %}">
+                AskPupkin
+            </a>
+        </div>
+        <div class="search-form">
+            <form action="{% url 'ask' %}">
+                <input class="search-form-input" placeholder="Search" type="text">
+                <button class="search-form-button">ASK!</button>
+            </form>
+        </div>
+        <div class="account">
+            {% block header %}
+            {% endblock %}
+        </div>
+    </header>
+    
+    <hr>
+
+    <main class="container">
+        <div class="content">
+
+            <div class="main-content">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+            <aside class="sidebar">
+                <section class="popular-tags">
+                    <h1>Popular Tags</h1>
+                    <div class="tags">
+                        <a href="{% url 'tag_view' 'perl' %}">perl</a>
+                        <a href="{% url 'tag_view' 'python' %}" style="color: #cd1714;">python</a>
+                        <a href="{% url 'tag_view' 'TechnoPark' %}">TechnoPark</a>
+                        <a href="{% url 'tag_view' 'MySQL' %}" style="color: #cd1714;">MySQL</a>
+                        <a href="{% url 'tag_view' 'django' %}" style="color: #54b250;">django</a>
+                        <a href="{% url 'tag_view' 'Mail.Ru' %}">Mail.Ru</a>
+                        <a href="{% url 'tag_view' 'Voloshin' %}">Voloshin</a>
+                        <a href="{% url 'tag_view' 'Firefox' %}" style="color: #ff9f23;">Firefox</a>
+                    </div>
+                </section>
+                
+                <section class="best-members">
+                    <h1>Best Members</h1>
+                    <ul class="best-members-list">
+                        <li><a href="{% url 'tag_view' 'Mr.Freeman' %}">Mr. Freeman</a></li>
+                        <li><a href="{% url 'tag_view' 'Dr.House' %}">Dr. House</a></li>
+                        <li><a href="{% url 'tag_view' 'Bender' %}">Bender</a></li>
+                        <li><a href="{% url 'tag_view' 'QueenVictoria' %}">Queen Victoria</a></li>
+                        <li><a href="{% url 'tag_view' 'V.Pupkin' %}">V. Pupkin</a></li>
+                    </ul>
+                </section>
+            </aside>
+
+        </div>
+    </main>
+
+</body>
+
+</html>

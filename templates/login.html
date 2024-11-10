@@ -1,0 +1,31 @@
+{% extends 'layouts/base.html' %}
+
+{% block header %}
+    {% include "layouts/unregistered.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="title-bar">
+        <h1>Log In</h1>
+    </div>
+
+    <div class="error-message">
+        Sorry, wrong password
+    </div>
+
+    <div class="user-details-form">
+        <div class="labels">
+            <label>Login</label>
+            <label>Password</label>
+        </div>
+
+        <div class="info-input">
+            <input class="user-form-control" placeholder="Enter login" maxlength="30">
+            <input class="user-form-control" type="password" placeholder="Enter password..." maxlength="30">
+            <button class="submit-button">Log in!</button>
+            <a href="{% url 'signup' %}">create new account</a>
+        </div>      
+    </div>
+
+{% endblock %}

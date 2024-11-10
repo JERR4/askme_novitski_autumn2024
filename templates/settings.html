@@ -1,0 +1,31 @@
+{% extends 'layouts/base.html' %}
+
+{% block header %}
+    {% include "layouts/registered.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="title-bar">
+        <h1>Settings: Dr. Pepper</h1>
+    </div>
+
+    <div class="user-details-form">
+        <div class="labels">
+            <label>Login</label>
+            <label>Email</label>
+            <label>NickName</label>
+            <label>Upload avatar</label>
+        </div>
+
+        <div class="info-input">
+            <input class="user-form-control" placeholder="Enter new login" maxlength="30">
+            <input class="user-form-control" placeholder="Enter new email" maxlength="320">
+            <input class="user-form-control" placeholder="Enter new nickname" maxlength="30">
+            <img src="../../static/images/avatar.webp" alt="Image" class="avatar-upload-image">
+            <input class="file-choice" type="file" placeholder="choose"></input>  
+            <button class="submit-button">save</button>
+        </div>      
+    </div>
+
+{% endblock %}

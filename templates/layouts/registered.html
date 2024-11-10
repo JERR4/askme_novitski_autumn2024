@@ -1,0 +1,12 @@
+{% load static %}
+
+<div class="account-image">
+    <img src="{% static 'images/avatar.webp' %}" alt="Image">
+</div>
+<div class="account-content">
+    <div class="account-name">Dr. Pepper</div>
+    <div class="account-actions">
+        <a href="{% url 'settings' %}">settings</a>
+        <a href="{% url 'login' %}">log out</a>
+    </div>
+</div>

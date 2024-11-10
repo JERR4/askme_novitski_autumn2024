@@ -1,0 +1,22 @@
+{% load static %}
+
+<article class="card">
+    <div class="card-left">
+        <img src="{% static 'images/moon.png' %}" alt="Image" class="card-image">
+        <input type="number" class="form-control card-likes" value="5" min="0">
+    </div>
+
+    <div class="card-right">
+        <div class="card-right-content">                
+            <div class="card-text">{{answer.text}}</div>
+        </div>
+
+        <div class="card-right-bottom">
+            <label class="correct-label">
+                <input type="checkbox" class="correct-checkbox">
+                Correct!
+            </label>
+        </div>
+        
+    </div>
+</article>
