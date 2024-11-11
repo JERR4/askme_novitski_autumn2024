@@ -44,25 +44,20 @@
                 <section class="popular-tags">
                     <h1>Popular Tags</h1>
                     <div class="tags">
-                        <a href="{% url 'tag_view' 'perl' %}">perl</a>
-                        <a href="{% url 'tag_view' 'python' %}" style="color: #cd1714;">python</a>
-                        <a href="{% url 'tag_view' 'TechnoPark' %}">TechnoPark</a>
-                        <a href="{% url 'tag_view' 'MySQL' %}" style="color: #cd1714;">MySQL</a>
-                        <a href="{% url 'tag_view' 'django' %}" style="color: #54b250;">django</a>
-                        <a href="{% url 'tag_view' 'Mail.Ru' %}">Mail.Ru</a>
-                        <a href="{% url 'tag_view' 'Voloshin' %}">Voloshin</a>
-                        <a href="{% url 'tag_view' 'Firefox' %}" style="color: #ff9f23;">Firefox</a>
+                        {% for tag, color in popular_tags %}
+                            <a href="{% url 'tag_view' tag.name %}" style="color: {{ color }};">
+                                {{ tag.name }}
+                            </a>
+                        {% endfor %}
                     </div>
                 </section>
                 
                 <section class="best-members">
                     <h1>Best Members</h1>
                     <ul class="best-members-list">
-                        <li><a href="{% url 'tag_view' 'Mr.Freeman' %}">Mr. Freeman</a></li>
-                        <li><a href="{% url 'tag_view' 'Dr.House' %}">Dr. House</a></li>
-                        <li><a href="{% url 'tag_view' 'Bender' %}">Bender</a></li>
-                        <li><a href="{% url 'tag_view' 'QueenVictoria' %}">Queen Victoria</a></li>
-                        <li><a href="{% url 'tag_view' 'V.Pupkin' %}">V. Pupkin</a></li>
+                        {% for best_member in best_members %}
+                            <li><a href="{% url 'tag_view' best_member.user.username %}">{{ best_member.user.username }}</a></li>
+                        {% endfor %}
                     </ul>
                 </section>
             </aside>
