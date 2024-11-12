@@ -22,9 +22,6 @@ venv.bak/
 db.sqlite3
 media/
 
-# Migrations
-*/migrations/*
-
 # If you're using django-debug-toolbar
 debug.log
 
