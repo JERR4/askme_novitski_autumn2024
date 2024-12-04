@@ -19,9 +19,13 @@
             <a href="{% url 'question_view' question.id %}">answer ({{question.count_answers}})</a>
 
             <div class="card-tags">
-                {% for tag in question.tags.all %}
-                    <a href="{% url 'tag_view' tag.name %}">{{ tag.name }}</a>
-                {% endfor %}
+                {% if question.tags.exists %}
+                    {% for tag in question.tags.all %}
+                        {% if tag.name %}
+                            <a href="{% url 'tag_view' tag.name %}">{{ tag.name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}    
             </div>
         </div>
     </div>

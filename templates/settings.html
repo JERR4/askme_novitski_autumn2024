@@ -1,31 +1,58 @@
 {% extends 'layouts/base.html' %}
 
-{% block header %}
-    {% include "layouts/registered.html" %}
-{% endblock %}
-
 {% block content %}
 
     <div class="title-bar">
-        <h1>Settings: Dr. Pepper</h1>
+        <h1>Settings: {{ user.username }}</h1>
     </div>
 
     <div class="user-details-form">
         <div class="labels">
-            <label>Login</label>
+            <label>Username</label>
             <label>Email</label>
-            <label>NickName</label>
-            <label>Upload avatar</label>
         </div>
 
-        <div class="info-input">
-            <input class="user-form-control" placeholder="Enter new login" maxlength="30">
-            <input class="user-form-control" placeholder="Enter new email" maxlength="320">
-            <input class="user-form-control" placeholder="Enter new nickname" maxlength="30">
-            <img src="../../static/images/avatar.webp" alt="Image" class="avatar-upload-image">
-            <input class="file-choice" type="file" placeholder="choose"></input>  
-            <button class="submit-button">save</button>
-        </div>      
+        <form action="{% url 'settings' %}" method="POST" class="info-input" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <input class="user-form-control" type="text" name="username" placeholder="Enter new username" maxlength="30" value="{{ form.username.value|default:'' }}">
+                {% for error in form.username.errors %}
+                    <div class="error-message-small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <input class="user-form-control" type="email" name="email" placeholder="Enter new email" maxlength="320" value="{{ form.email.value|default:'' }}">
+                {% for error in form.email.errors %}
+                    <div class="error-message-small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% endif %}" alt="Current Avatar" class="avatar-upload-image" id="avatar-image">
+
+            <div class="form-group">
+                <input class="file-choice" type="file" name="avatar" id="avatar-upload">
+                {% for error in form.avatar.errors %}
+                    <div class="error-message-small">{{ error }}</div>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" class="submit-button">Save</button>
+        </form>   
     </div>
+
+    <script>
+        document.getElementById('avatar-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatar-image').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 
 {% endblock %}

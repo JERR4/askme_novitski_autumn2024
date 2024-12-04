@@ -1,53 +1,59 @@
 {% extends 'layouts/base.html' %}
 
 {% load static %}
-
-{% block header %}
-    {% include "layouts/registered.html" %}
-{% endblock %}
-
 {% block content %}
+<article class="question">
+    <div class="question-left">
+        <img src="{% static 'images/moon.png' %}" alt="Image" class="question-image">
+        <input type="number" class="form-control card-likes" value={{question.get_rating}} min="0">
+    </div>
 
-    <article class="question">
-        <div class="question-left">
-            <img src="{% static 'images/moon.png' %}" alt="Image" class="question-image">
-            <input type="number" class="form-control card-likes" value={{question.get_rating}} min="0">
+    <div class="question-right">
+        <div class="question-right-content">
+            <h1>{{question.title}}</h1>
+            <div class="question-text">{{question.text}}</div>
         </div>
-    
-        <div class="question-right">
-            <div class="question-right-content">
-                <h1>{{question.title}}</h1>
-    
-                <div class="question-text">{{question.text}}</div>
-            </div>
-    
-            <div class="card-right-bottom">
-    
+
+        <div class="card-right-bottom">
+            <div class="card-tags">
+                Tags: 
                 <div class="card-tags">
-                    Tags: 
-                    {% for tag in question.tags.all %}
-                        <a href="{% url 'tag_view' tag.name %}">{{ tag.name }}</a>
-                    {% endfor %}
-                </div>
+                    {% if question.tags.exists %}
+                        {% for tag in question.tags.all %}
+                            {% if tag.name %}
+                                <a href="{% url 'tag_view' tag.name %}">{{ tag.name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}    
+                </div>  
             </div>
         </div>
-    </article>
+    </div>
+</article>
 
-    <hr>    
+<hr>    
 
-    {% for answer in answers %}
+{% for answer in answers %}
+    <div id="answer-{{ answer.id }}" class="answer-card">
         {% include 'components/answer_card.html' %}
-    {% endfor %}
+    </div>
+{% endfor %}
 
-    {% include 'components/pagination.html' %}
+{% include 'components/pagination.html' %}
 
-    <hr>
+<hr>
 
-    <article class="answer">
+<article class="answer">
+    <form method="POST" action="{% url 'add_answer' question.id %}">
+        {% csrf_token %}
+        
         <div class="text-input">
-            <textarea class="form-control" rows="6" placeholder="Enter your answer here..."></textarea>
+            <textarea name="text" class="form-control" rows="6" placeholder="Enter your answer here..."></textarea>
         </div>
-        <button class="submit-button">Answer</button>
-    </article>
+        
+        <button type="submit" class="submit-button">Answer</button>
+    </form>
+</article>
+
 
 {% endblock %}

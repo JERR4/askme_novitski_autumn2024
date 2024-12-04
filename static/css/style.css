@@ -357,6 +357,17 @@ hr {
 .error-message {
     color: #d34846;
 }
+
+.error-message-small {
+    position: absolute; 
+    font-size: 12px;
+    color: #d34846;
+}
+
+.form-group {
+    position: relative;
+}
+
 .title-form {
     display: flex;
     align-items: center;

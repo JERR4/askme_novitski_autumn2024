@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum, F, Count, Q
+from django.urls import reverse
 
 class QuestionLike(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE, db_index=True)
@@ -55,6 +56,9 @@ class Question(models.Model):
         upvotes = QuestionLike.objects.filter(question=self, is_upvote=True).count()
         downvotes = QuestionLike.objects.filter(question=self, is_upvote=False).count()
         return upvotes - downvotes
+    
+    def get_absolute_url(self):
+        return reverse('question_view', kwargs={'question_id': self.id})
     
     def count_answers(self):
         return Answer.objects.filter(question=self).count()

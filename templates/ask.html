@@ -1,42 +1,36 @@
-{% extends 'layouts/base.html' %}
-
-{% block header %}
-    {% include "layouts/registered.html" %}
-{% endblock %}
+ {% extends 'layouts/base.html' %}
 
 {% block content %}
-
     <div class="title-bar">
         <h1>New Question</h1>
     </div>
 
-    <div class="error-message">
-        Sorry, not all fields are filled out
-    </div>
+    <form method="POST" enctype="multipart/form-data" class="info-input">
+        {% csrf_token %}
+        
+        <article class="title-form">
+            <label for="id_title">Title</label>
+            <div class="info-input">
+                <input class="form-control" type="text" name="title" id="id_title" placeholder="Enter title here..." maxlength="120" value="{{ form.title.value|default:''  }}">
+            </div>
+        </article>
+        
+        <article class="text-form">
+            <label for="id_text">Text</label>
+            <div class="info-input">
+                <textarea class="form-control" name="text" id="id_text" rows="20" placeholder="Enter your text here...">{{ form.text.value|default:'' }}</textarea>
+            </div>
+        </article>
+        
+        <article class="tags-form">
+            <label for="id_tags">Tags</label>
+            <div class="info-input">
+                <input class="form-control" type="text" name="tags" id="id_tags" placeholder="Enter tags here..." maxlength="120" value="{{ form.tags.value|default:''  }}">
+            </div>
+        </article>
 
-    <article class="title-form">
-        <label>Title</label>
-        <div class="info-input">
-            <input class="form-control" placeholder="Enter title here..." maxlength="120">
-        </div>                    
-    </article>
-    
-    <article class="text-form">
-        <label>Text</label>
-        <div class="info-input">
-            <textarea class="form-control" rows="20" placeholder="Enter your text here..."></textarea>
+        <div class="ask-button-area">
+            <button type="submit" class="submit-button">ASK!</button>
         </div>
-    </article>
-    
-    <article class="tags-form">
-        <label>Tags</label>
-        <div class="info-input">
-            <input class="form-control" placeholder="Enter tags here..."maxlength="120">
-        </div>
-    </article>
-
-    <div class="ask-button-area">
-        <button class="submit-button">ASK!</button>
-    </div>        
-
+    </form>
 {% endblock %}
