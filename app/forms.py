@@ -123,7 +123,19 @@ class AskForm(forms.Form):
         return question
     
 class AnswerForm(forms.Form):
-    text = forms.CharField()
+    text = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Your answer here...'}))
+
+    def clean_text(self):
+        text = self.cleaned_data.get('text')
+        print(f"Original text: '{text}'")  # Выводим исходное значение поля text
+
+        if not text.strip():  # Убедитесь, что строка не пустая или состоит только из пробелов
+            print("Validation failed: The answer is empty or only spaces.")  # Выводим сообщение об ошибке
+            raise forms.ValidationError('The answer can not be empty!')
+        
+        print(f"Validated text: '{text.strip()}'")  # Выводим очищенную строку (без пробелов)
+        return text
+
 
     def save(self, author, question):
         return Answer.objects.create(

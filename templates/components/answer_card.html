@@ -1,9 +1,21 @@
 {% load static %}
 
-<article class="card">
+<article class="card-answer" data-answer-id="{{answer.id}}">
     <div class="card-left">
         <img src="{% static 'images/moon.png' %}" alt="Image" class="card-image">
-        <input type="number" class="form-control card-likes" value={{answer.get_rating}} min="0">
+        <div class="form-group">
+            {% if request.user.is_authenticated %}
+                <button class="btn {% if answer.user_vote == True %}btn-like active{% else %}btn-like{% endif %}">
+                    👍
+                </button>
+            {% endif %}
+            <span class="like-counter">{{ answer.get_rating }}</span>
+            {% if request.user.is_authenticated %}
+                <button class="btn {% if answer.user_vote == False %}btn-dislike active{% else %}btn-dislike{% endif %}">
+                    👎
+                </button>
+            {% endif %}
+        </div>
     </div>
 
     <div class="card-right">
@@ -13,10 +25,10 @@
 
         <div class="card-right-bottom">
             <label class="correct-label">
-                <input type="checkbox" class="correct-checkbox">
+                <input type="checkbox" class="correct-checkbox" {% if answer.correctness %}checked{% endif %}
+                    {% if question.author != request.user %} disabled {% endif %}>
                 Correct!
             </label>
         </div>
-        
     </div>
 </article>

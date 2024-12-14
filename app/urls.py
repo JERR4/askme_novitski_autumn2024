@@ -13,4 +13,7 @@ urlpatterns = [
     path('logout/', logout, name='logout'), 
     path('settings/', settings, name='settings'),  
     path('ask/', ask, name='ask'), 
+    path('question_like/<int:question_id>/', question_like, name='question_like'),
+    path('answer_like/<int:answer_id>/', answer_like, name='answer_like'),
+    path('answer/rate_correct/<int:answer_id>/', rate_correct, name='rate_correct'),
 ]

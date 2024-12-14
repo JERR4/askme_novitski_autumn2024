@@ -138,16 +138,23 @@ hr {
     width: 30%;
 }
 
-.card {
+.card, .card-answer {
     border: 3px solid black;
     padding: 10px 10px 30px 10px;
+    height: 100%;
     display: flex;
     gap: 10px;
 }
 
+.card, .card-answer, .answer-card, .card-left, .card-right {
+    box-sizing: border-box;
+}
+
+
 .card-left {
     display: flex;
     flex-direction: column;
+    align-items: center;
     flex-shrink: 0;
     width: 100px;
     gap: 5px;
@@ -205,6 +212,29 @@ hr {
 .card-tags {
     margin-right: 20px;
 }
+
+.btn-like {
+    background-color: transparent;
+    color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-like.active {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-dislike {
+    background-color: transparent;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-dislike.active {
+    background-color: #dc3545;
+    color: white;
+}
+
 
 .pagination {
     margin: 0;
@@ -280,6 +310,7 @@ hr {
     display: flex;
     flex-shrink: 0;
     flex-direction: column;
+    align-items: center;
     width: 150px;
     gap: 5px;
     margin-right: 20px;
@@ -294,9 +325,9 @@ hr {
 
 .question-right {
     display: flex;
-    flex-direction: column; /* Устанавливает вертикальное направление для дочерних элементов */
-    justify-content: space-between; /* Размещает элементы так, чтобы верхний занимал верх, а нижний — низ */
-    height: 100%; /* Задает высоту на 100% родительского элемента */
+    flex-direction: column; 
+    justify-content: space-between; 
+    height: 100%;
 }
 
 .question-right-content h1 {
@@ -305,11 +336,6 @@ hr {
 
 .question-right h4{
     font-size: 26px;
-}
-
-.question-right-bottom {
-    display: flex;
-    justify-content: space-between;
 }
 
 .correct-label {
