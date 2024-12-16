@@ -1,0 +1,54 @@
+(venv) jerry@Yaroslavs-MacBook-Pro askme_novitski % ab -c 100 -n 2000 http://127.0.0.1/uploads/avatar.webp
+This is ApacheBench, Version 2.3 <$Revision: 1913912 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 200 requests
+Completed 400 requests
+Completed 600 requests
+Completed 800 requests
+Completed 1000 requests
+Completed 1200 requests
+Completed 1400 requests
+Completed 1600 requests
+Completed 1800 requests
+Completed 2000 requests
+Finished 2000 requests
+
+
+Server Software:        nginx/1.27.3
+Server Hostname:        127.0.0.1
+Server Port:            80
+
+Document Path:          /uploads/avatar.webp
+Document Length:        38070 bytes
+
+Concurrency Level:      100
+Time taken for tests:   0.298 seconds
+Complete requests:      2000
+Failed requests:        0
+Total transferred:      76808000 bytes
+HTML transferred:       76140000 bytes
+Requests per second:    6712.60 [#/sec] (mean)
+Time per request:       14.897 [ms] (mean)
+Time per request:       0.149 [ms] (mean, across all concurrent requests)
+Transfer rate:          251748.84 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   1.1      0       4
+Processing:     3   13  24.1      7     125
+Waiting:        3   13  24.0      7     125
+Total:          6   13  24.7      7     125
+
+Percentage of the requests served within a certain time (ms)
+  50%      7
+  66%      7
+  75%      7
+  80%      8
+  90%     10
+  95%    109
+  98%    123
+  99%    124
+ 100%    125 (longest request)

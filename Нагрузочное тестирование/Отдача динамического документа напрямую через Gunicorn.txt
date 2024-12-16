@@ -1,0 +1,55 @@
+(venv) jerry@Yaroslavs-MacBook-Pro askme_novitski % ab -n 1000 -c 10 http://127.0.0.1:8000/tag/tag746/  
+
+This is ApacheBench, Version 2.3 <$Revision: 1913912 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        gunicorn
+Server Hostname:        127.0.0.1
+Server Port:            8000
+
+Document Path:          /tag/tag746/
+Document Length:        11347 bytes
+
+Concurrency Level:      10
+Time taken for tests:   90.055 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      11644000 bytes
+HTML transferred:       11347000 bytes
+Requests per second:    11.10 [#/sec] (mean)
+Time per request:       900.545 [ms] (mean)
+Time per request:       90.055 [ms] (mean, across all concurrent requests)
+Transfer rate:          126.27 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.1      0       2
+Processing:   479  894 295.1    810    2758
+Waiting:      463  892 294.6    808    2756
+Total:        479  894 295.1    811    2759
+
+Percentage of the requests served within a certain time (ms)
+  50%    811
+  66%    887
+  75%    967
+  80%   1026
+  90%   1270
+  95%   1530
+  98%   1733
+  99%   2038
+ 100%   2759 (longest request)

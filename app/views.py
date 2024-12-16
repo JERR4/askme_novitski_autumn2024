@@ -29,10 +29,12 @@ def index(request):
 def hot(request):
     QUESTIONS = Question.objects.get_hot()
     page = paginate(QUESTIONS, request)
+    user=request.user
+    if user.is_authenticated:
+        for question in page.object_list:
+            existing_like = QuestionLike.objects.filter(user=user, question=question).first()
+            question.user_vote = existing_like.is_upvote if existing_like else None
 
-    for question in page.object_list:
-        existing_like = QuestionLike.objects.filter(user=request.user, question=question).first()
-        question.user_vote = existing_like.is_upvote if existing_like else None
 
     return render(request, 'index.html', 
                   context={
@@ -44,10 +46,12 @@ def hot(request):
 def tag_view(request, tag_name):
     QUESTIONS = Question.objects.get_new().filter(tags__name=tag_name)
     page = paginate(QUESTIONS, request)
+    user=request.user
+    if user.is_authenticated:
+        for question in page.object_list:
+            existing_like = QuestionLike.objects.filter(user=user, question=question).first()
+            question.user_vote = existing_like.is_upvote if existing_like else None
 
-    for question in page.object_list:
-        existing_like = QuestionLike.objects.filter(user=request.user, question=question).first()
-        question.user_vote = existing_like.is_upvote if existing_like else None
     
     return render(request, 'index.html', 
                   context={
