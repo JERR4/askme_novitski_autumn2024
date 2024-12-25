@@ -2,7 +2,7 @@
 
 <article class="card" data-question-id="{{question.id}}">
     <div class="card-left">
-        <img src="{% static 'images/moon.png' %}" alt="Image" class="card-image">
+        <img src="{% if question.author.profile.avatar %}{{ question.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Avatar" class="card-image">
         <div class="form-group">
             {% if request.user.is_authenticated %}
                 <button class="btn {% if question.user_vote == True %}btn-like active{% else %}btn-like{% endif %}">
