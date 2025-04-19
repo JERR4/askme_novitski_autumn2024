@@ -1,0 +1,48 @@
+upstream askme_novitski {
+    server 127.0.0.1:8000;
+}
+
+proxy_cache_path /Users/jerry/technopark/web/askme_novitski_autumn2024_$
+    levels=1:2 keys_zone=askme_novitski_zone:10m
+    inactive=24h max_size=50m;
+
+
+server {
+    listen 80 default_server;
+    server_name localhost;
+
+        error_log /opt/homebrew/var/log/nginx/askme_novitski_error.log;
+        access_log /opt/homebrew/var/log/nginx/askme_novitski_access.lo$
+
+
+    # Сжатие файлов
+    gzip on;
+    gzip_types text/plain application/javascript text/css image/jpeg im$
+    gzip_min_length 256;
+
+    # Статические файлы
+    location ~* \.(js|css|jpg|jpeg|png|svg|ico|webp)$ {
+        root /Users/jerry/technopark/web/askme_novitski_autumn2024_work$
+        expires max;
+        add_header Cache-Control public;
+    }
+
+    # Загруженные файлы
+    location /uploads {
+        root /Users/jerry/technopark/web/askme_novitski_autumn2024_work$
+        expires max;
+        add_header Cache-Control public;
+    }
+
+    # Обработка запросов к приложению
+    location / {
+        proxy_pass http://askme_novitski;
+        proxy_set_header Host $host;
+
+
+        proxy_cache askme_novitski_zone;
+        proxy_cache_valid 200 302 10m;
+        proxy_cache_valid 404      1m;
+        add_header X-Cache-Status $upstream_cache_status;
+    }
+}

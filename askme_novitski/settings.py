@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'app.context_processors.popular_tags',
                 'app.context_processors.best_members',
+                'app.context_processors.get_centrifugo_info',
             ],
         },
     },
@@ -124,6 +125,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATIC_ROOT = BASE_DIR / 'static'
+
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
@@ -138,4 +141,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/uploads/'
 MEDIA_ROOT = BASE_DIR / 'uploads'
+
+CENTRIFUGO_SECRET_KEY = "my_secret"
+CENTRIFUGO_WS_URL = "ws://localhost:8010/connection/websocket"
+CENTRIFUGO_API_URL = "http://localhost:8010/api"
+CENTRIFUGO_API_KEY = "my_api_key"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": "/tmp/django_cache",
+    }
+}
 

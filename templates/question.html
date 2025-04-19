@@ -4,7 +4,7 @@
 {% block content %}
 <article class="card" data-question-id="{{question.id}}">
     <div class="question-left">
-        <img src="{% static 'images/moon.png' %}" alt="Image" class="question-image">
+        <img src="{% if question.author.profile.avatar %}{{ question.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Avatar" class="question-image">
         <div class="form-group">
             {% if request.user.is_authenticated %}
                 <button class="btn {% if question.user_vote == True %}btn-like active{% else %}btn-like{% endif %}">
@@ -45,17 +45,17 @@
 
 <hr>    
 
-{% for answer in answers %}
-    <div id="answer-{{ answer.id }}" class="answer-card">
+<div class="answer-cards" id = "answers-container">
+    {% for answer in answers %}
         {% include 'components/answer_card.html' %}
-    </div>
-{% endfor %}
+    {% endfor %}
+</div>
 
 {% include 'components/pagination.html' %}
 
 <hr>
 
-<article class="answer">
+<article class="new-answer">
     <form method="POST" action="{% url 'add_answer' question.id %}">
         {% csrf_token %}
         
@@ -68,5 +68,83 @@
 </article>
 
 <script src="{% static 'js/app.js' %}"></script>
+
+<script src="https://unpkg.com/centrifuge@5.0.1/dist/centrifuge.js"></script>
+<script type="text/javascript">
+    const container = document.getElementById('counter');
+
+    const centrifuge = new Centrifuge("{{ ws_url }}", {
+        token: "{{ token }}"
+    });
+
+    centrifuge.on('connecting', function (ctx) {
+        console.log(`connecting: ${ctx.code}, ${ctx.reason}`);
+    }).on('connected', function (ctx) {
+        console.log(`connected over ${ctx.transport}`);
+    }).on('disconnected', function (ctx) {
+        console.log(`disconnected: ${ctx.code}, ${ctx.reason}`);
+    }).connect();
+
+    const sub = centrifuge.newSubscription("{{ question.id }}");
+
+    sub.on('publication', function (ctx) {
+        const pageIdFromData = parseInt(ctx.data.page_id);
+        const currentPage = {{ page_obj.number }};
+
+        console.log(`Received publication: page_id=${pageIdFromData}, current_page=${currentPage}`);
+        
+        if (parseInt(ctx.data.page_id) === {{page_obj.number}}) {
+            const answerCards = document.getElementById("answers-container");
+        
+            const newCard = document.createElement("article");
+            newCard.classList.add("card-answer");
+            newCard.setAttribute("data-answer-id", ctx.data.answer_id);
+
+            const avatarUrl = ctx.data.avatar_url || "{% static 'img/default-avatar.png' %}";
+        
+            newCard.innerHTML = `
+                <div class="card-left">
+                    <img src="${avatarUrl}" alt="Avatar" class="card-image">
+                    <div class="form-group">
+                        {% if request.user.is_authenticated %}
+                            <button class="btn-like">
+                                👍
+                            </button>
+                        {% endif %}
+                        <span class="like-counter">${ctx.data.rating || 0}</span>
+                        {% if request.user.is_authenticated %}
+                            <button class="btn-dislike">
+                                👎
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-right">
+                    <div class="card-right-content">                
+                        <div class="card-text">${ctx.data.message}</div>
+                    </div>
+                    <div class="card-right-bottom">
+                        <label class="correct-label">
+                            <input type="checkbox" class="correct-checkbox" ${ctx.data.correctness ? "checked" : ""}
+                            {% if question.author != request.user %} disabled {% endif %}>
+                            Correct!
+                        </label>
+                    </div>
+                </div>
+            `;
+        
+            answerCards.appendChild(newCard);
+        } else if (pageIdFromData > currentPage) {
+            window.location.href = `?page=${pageIdFromData}`;
+        }
+    }).on('subscribing', function (ctx) {
+        console.log(`subscribing: ${ctx.code}, ${ctx.reason}`);
+    }).on('subscribed', function (ctx) {
+        console.log('subscribed', ctx);
+    }).on('unsubscribed', function (ctx) {
+        console.log(`unsubscribed: ${ctx.code}, ${ctx.reason}`);
+    }).subscribe();
+</script>
+
 
 {% endblock %}

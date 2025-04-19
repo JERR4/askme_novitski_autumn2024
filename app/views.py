@@ -1,13 +1,18 @@
 import json
+from cent import Client, PublishRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.urls import reverse
+
+from askme_novitski.settings import CENTRIFUGO_API_KEY, CENTRIFUGO_API_URL
 from .utils import *
 from .models import *
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from app.forms import LoginForm, RegisterForm, SettingsForm, AskForm, AnswerForm
+from app.forms import *
 from django.views.decorators.http import require_POST
+
+from django.contrib.postgres.search import SearchVector, SearchQuery
 
 def index(request):
     QUESTIONS = Question.objects.get_new()
@@ -29,10 +34,12 @@ def index(request):
 def hot(request):
     QUESTIONS = Question.objects.get_hot()
     page = paginate(QUESTIONS, request)
+    user=request.user
+    if user.is_authenticated:
+        for question in page.object_list:
+            existing_like = QuestionLike.objects.filter(user=user, question=question).first()
+            question.user_vote = existing_like.is_upvote if existing_like else None
 
-    for question in page.object_list:
-        existing_like = QuestionLike.objects.filter(user=request.user, question=question).first()
-        question.user_vote = existing_like.is_upvote if existing_like else None
 
     return render(request, 'index.html', 
                   context={
@@ -44,10 +51,12 @@ def hot(request):
 def tag_view(request, tag_name):
     QUESTIONS = Question.objects.get_new().filter(tags__name=tag_name)
     page = paginate(QUESTIONS, request)
+    user=request.user
+    if user.is_authenticated:
+        for question in page.object_list:
+            existing_like = QuestionLike.objects.filter(user=user, question=question).first()
+            question.user_vote = existing_like.is_upvote if existing_like else None
 
-    for question in page.object_list:
-        existing_like = QuestionLike.objects.filter(user=request.user, question=question).first()
-        question.user_vote = existing_like.is_upvote if existing_like else None
     
     return render(request, 'index.html', 
                   context={
@@ -167,8 +176,23 @@ def add_answer(request, question_id):
         print(form.is_valid())
         if form.is_valid():
             answer = form.save(author=request.user, question=question)
+
             answers = Answer.objects.filter(question=question)
             page = paginate(answers, request)
+
+            client = Client(CENTRIFUGO_API_URL, CENTRIFUGO_API_KEY)
+            publish_request = PublishRequest(
+                channel=str(question_id),
+                data={
+                    "message": answer.text,
+                    "answer_id": answer.id,
+                    "correctness": answer.correctness,
+                    "page_id": page.paginator.num_pages,
+                    "avatar_url": answer.author.profile.avatar.url if answer.author.profile.avatar else None
+                }
+            )
+            result = client.publish(publish_request)
+
             redirect_url = f"{question.get_absolute_url()}?page={page.paginator.num_pages}#answer-{answer.id}"
             return redirect(redirect_url)
         else:
@@ -180,7 +204,6 @@ def add_answer(request, question_id):
 
     return render(request, 'question.html', {'question': question, 'form': form})
 
-
 from django.shortcuts import redirect
 
 @login_required
@@ -188,54 +211,34 @@ from django.shortcuts import redirect
 def question_like(request, question_id):
     try:
         data = json.loads(request.body)
-        is_upvote = data.get('is_upvote')
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-    user = request.user
-    question = Question.objects.filter(id=question_id).first()
-    if not question:
-        return JsonResponse({"error": "Question not found"}, status=404)
+    data['question_id'] = question_id
 
-    existing_like = QuestionLike.objects.filter(user=user, question=question).first()
-    if existing_like:
-        if existing_like.is_upvote == is_upvote:
-            existing_like.delete()
-        else:
-            existing_like.is_upvote = is_upvote
-            existing_like.save()
+    form = QuestionLikeForm(data)
+    if form.is_valid():
+        likes_count = form.save(user=request.user)
+        return JsonResponse({'likes_count': likes_count})
     else:
-        QuestionLike.objects.create(user=user, question=question, is_upvote=is_upvote)
-
-    likes_count = question.get_rating()
-    return JsonResponse({'likes_count': likes_count})
+        return JsonResponse({"error": form.errors}, status=400)
 
 @login_required
 @require_POST
 def answer_like(request, answer_id):
     try:
         data = json.loads(request.body)
-        is_upvote = data.get('is_upvote')
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-    user = request.user
-    answer = Answer.objects.filter(id=answer_id).first()
-    if not answer:
-        return JsonResponse({"error": "Answer not found"}, status=404)
+    data['answer_id'] = answer_id
 
-    existing_like = AnswerLike.objects.filter(user=user, answer=answer).first()
-    if existing_like:
-        if existing_like.is_upvote == is_upvote:
-            existing_like.delete()
-        else:
-            existing_like.is_upvote = is_upvote
-            existing_like.save()
+    form = AnswerLikeForm(data)
+    if form.is_valid():
+        likes_count = form.save(user=request.user)
+        return JsonResponse({'likes_count': likes_count})
     else:
-        AnswerLike.objects.create(user=user, answer=answer, is_upvote=is_upvote)
-
-    likes_count = answer.get_rating()
-    return JsonResponse({'likes_count': likes_count})
+        return JsonResponse({"error": form.errors}, status=400)
     
 @login_required
 @require_POST
@@ -248,6 +251,8 @@ def rate_correct(request, answer_id):
 
     user = request.user
     answer = Answer.objects.filter(id=answer_id).first()
+    if (answer.question.author.id != user.id):
+        return JsonResponse({"error": "You are not the author"}, status=403)
     if not answer:
         return JsonResponse({"error": "Answer not found"}, status=404)
 
@@ -259,4 +264,18 @@ def rate_correct(request, answer_id):
     answer.save()
     return JsonResponse({'answer_correctness': answer.correctness})
 
+def search_questions(query):
+    search_vector = SearchVector('title', 'text')
+    search_query = SearchQuery(query)
 
+    return Question.objects.annotate(search=search_vector).filter(search=search_query)
+
+def search_view(request):
+    query = request.GET.get('query', '')
+    results = []
+    
+    if query:
+        search_results = search_questions(query)
+        results = [{'title': result.title, 'id': result.id} for result in search_results][:10]
+    
+    return JsonResponse({'results': results})

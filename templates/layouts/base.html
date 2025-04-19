@@ -18,12 +18,13 @@
                 AskPupkin
             </a>
         </div>
+
         <div class="search-form">
-            <form action="{% url 'ask' %}">
-                <input class="search-form-input" placeholder="Search" type="text">
-                <button class="search-form-button">ASK!</button>
-            </form>
+            <input class="search-form-input" id="search-input" placeholder="Search" type="text">
+            <div class="hint" id="search-results"></div>
+            <a href="{% url 'ask' %}" class="search-form-button">ASK!</a>
         </div>
+        
         <div class="account">
             {% if request.user.is_authenticated %}
                 <div class="account-image">
@@ -75,7 +76,7 @@
                     <h1>Best Members</h1>
                     <ul class="best-members-list">
                         {% for best_member in best_members %}
-                            <li><a href="{% url 'tag_view' best_member.user.username %}">{{ best_member.user.username }}</a></li>
+                            <li><a href="{% url 'tag_view' best_member.username %}">{{ best_member.username }}</a></li>
                         {% endfor %}
                     </ul>
                 </section>
@@ -83,7 +84,56 @@
 
         </div>
     </main>
+    
+    <script>
+        let timeout;
+        const searchInput = document.getElementById('search-input');
+        const resultsContainer = document.getElementById('search-results');
+    
+        searchInput.addEventListener('input', function(event) {
+            clearTimeout(timeout);
+            const query = event.target.value;
+    
+            if (query.length >= 3) {
+                timeout = setTimeout(function() {
+                    fetchSearchResults(query);
+                }, 300);
+            } else {
+                resultsContainer.innerHTML = '';
+            }
+        });
 
+        searchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                resultsContainer.style.display = 'none';
+            }, 200);
+        });
+
+        searchInput.addEventListener('focus', function() {
+            if (resultsContainer.innerHTML.trim() !== '') {
+                resultsContainer.style.display = 'block';
+            }
+        });
+    
+        function fetchSearchResults(query) {
+            fetch(`/search/?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    displaySearchResults(data);
+                });
+        }
+    
+        function displaySearchResults(data) {
+            resultsContainer.innerHTML = '';
+    
+            data.results.forEach(item => {
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('search-result-item');
+                resultItem.innerHTML = `<a href="/question/${item.id}/">${item.title}</a>`;
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+    </script>
 </body>
 
 </html>

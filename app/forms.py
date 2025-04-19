@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.core.validators import EmailValidator
-from .models import Answer, Question, Tag ,Profile
+from .models import Answer, Question, Tag ,Profile, QuestionLike, AnswerLike
 
 
 class LoginForm(forms.Form):
@@ -127,13 +128,9 @@ class AnswerForm(forms.Form):
 
     def clean_text(self):
         text = self.cleaned_data.get('text')
-        print(f"Original text: '{text}'")  # Выводим исходное значение поля text
 
-        if not text.strip():  # Убедитесь, что строка не пустая или состоит только из пробелов
-            print("Validation failed: The answer is empty or only spaces.")  # Выводим сообщение об ошибке
+        if not text.strip():
             raise forms.ValidationError('The answer can not be empty!')
-        
-        print(f"Validated text: '{text.strip()}'")  # Выводим очищенную строку (без пробелов)
         return text
 
 
@@ -143,3 +140,51 @@ class AnswerForm(forms.Form):
             author=author,
             question=question
         )
+
+class QuestionLikeForm(forms.Form):
+    question_id = forms.IntegerField()
+    is_upvote = forms.NullBooleanField()
+
+    def save(self, user):
+        question_id = self.cleaned_data['question_id']
+        is_upvote = self.cleaned_data['is_upvote']
+
+        question = Question.objects.filter(id=question_id).first()
+        if not question:
+            return JsonResponse({"error": "Question not found"}, status=404)
+
+        existing_like = QuestionLike.objects.filter(user=user, question=question).first()
+        if existing_like:
+            if existing_like.is_upvote == is_upvote:
+                existing_like.delete()
+            else:
+                existing_like.is_upvote = is_upvote
+                existing_like.save()
+        else:
+            QuestionLike.objects.create(user=user, question=question, is_upvote=is_upvote)
+
+        return question.get_rating()
+    
+class AnswerLikeForm(forms.Form):
+    answer_id = forms.IntegerField()
+    is_upvote = forms.NullBooleanField()
+
+    def save(self, user):
+        answer_id = self.cleaned_data['answer_id']
+        is_upvote = self.cleaned_data['is_upvote']
+
+        answer = Answer.objects.filter(id=answer_id).first()
+        if not answer:
+            return JsonResponse({"error": "Answer not found"}, status=404)
+
+        existing_like = AnswerLike.objects.filter(user=user, answer=answer).first()
+        if existing_like:
+            if existing_like.is_upvote == is_upvote:
+                existing_like.delete()
+            else:
+                existing_like.is_upvote = is_upvote
+                existing_like.save()
+        else:
+            AnswerLike.objects.create(user=user, answer=answer, is_upvote=is_upvote)
+
+        return answer.get_rating()

@@ -14,48 +14,60 @@ function getCookie(name) {
 }
 
 const csrftoken = getCookie('csrftoken');
-const cards = document.getElementsByClassName('card');
 
-for (const card of cards) {
-    const likeButton = card.querySelector('.btn-like');
-    const dislikeButton = card.querySelector('.btn-dislike');
-    const likeCounter = card.querySelector('.like-counter');
-    const questionId = card.dataset.questionId;
+const answersContainer = document.getElementById("answers-container");
 
-    likeButton.addEventListener('click', async (event) => {
-        event.preventDefault(); 
-        await sendVote(questionId, true, likeCounter, likeButton, dislikeButton, 'question');
-    });
+if (answersContainer) {
+    answersContainer.addEventListener('click', async function(event) {
+        if (event.target.matches('.btn-like')) {
+            const card = event.target.closest('.card-answer');
+            const answerId = card.dataset.answerId;
+            const likeCounter = card.querySelector('.like-counter');
+            const dislikeButton = card.querySelector('.btn-dislike');
+            event.preventDefault();
+            await sendVote(answerId, true, likeCounter, event.target, dislikeButton, 'answer');
+        }
 
-    dislikeButton.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await sendVote(questionId, false, likeCounter, likeButton, dislikeButton, 'question');
-    });
-}
+        if (event.target.matches('.btn-dislike')) {
+            const card = event.target.closest('.card-answer');
+            const answerId = card.dataset.answerId;
+            const likeCounter = card.querySelector('.like-counter');
+            const likeButton = card.querySelector('.btn-like');
+            event.preventDefault();
+            await sendVote(answerId, false, likeCounter, likeButton, event.target, 'answer');
+        }
 
-const answerCards = document.getElementsByClassName('card-answer');
-
-for (const card of answerCards) {
-    const likeButton = card.querySelector('.btn-like');
-    const dislikeButton = card.querySelector('.btn-dislike');
-    const likeCounter = card.querySelector('.like-counter');
-    const answerId = card.dataset.answerId;
-    const checkbox = card.querySelector('.correct-checkbox');
-
-    likeButton.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await sendVote(answerId, true, likeCounter, likeButton, dislikeButton, 'answer');
-    });
-
-    dislikeButton.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await sendVote(answerId, false, likeCounter, likeButton, dislikeButton, 'answer');
-    });
-
-    checkbox.addEventListener('click', async (event) => {
-        await rateCorrect(answerId, checkbox.checked);
+        if (event.target.matches('.correct-checkbox')) {
+            const card = event.target.closest('.card-answer');
+            const answerId = card.dataset.answerId;
+            await rateCorrect(answerId, event.target.checked);
+        }
     });
 }
+
+const questionsContainers = document.getElementsByClassName("card");
+
+Array.from(questionsContainers).forEach(function(card) {
+    card.addEventListener('click', async function(event) {
+        // Ваш код обработки клика
+        if (event.target.matches('.btn-like')) {
+            const questionId = card.dataset.questionId;
+            const likeCounter = card.querySelector('.like-counter');
+            const dislikeButton = card.querySelector('.btn-dislike');
+            event.preventDefault();
+            await sendVote(questionId, true, likeCounter, event.target, dislikeButton, 'question');
+        }
+    
+        if (event.target.matches('.btn-dislike')) {
+            const questionId = card.dataset.questionId;
+            const likeCounter = card.querySelector('.like-counter');
+            const likeButton = card.querySelector('.btn-like');
+            event.preventDefault();
+            await sendVote(questionId, false, likeCounter, likeButton, event.target, 'question');
+        }
+    });
+});
+
 
 async function sendVote(id, isUpvote, likeCounter, likeButton, dislikeButton, type) {
     try {
@@ -71,21 +83,13 @@ async function sendVote(id, isUpvote, likeCounter, likeButton, dislikeButton, ty
         if (response.ok) {
             const data = await response.json();
             likeCounter.textContent = data.likes_count;
-
+        
             if (isUpvote) {
-                if (likeButton.classList.contains('active')) {
-                    likeButton.classList.remove('active');
-                } else {
-                    likeButton.classList.add('active');
-                    dislikeButton.classList.remove('active');
-                }
+                likeButton.classList.toggle('active');
+                dislikeButton.classList.remove('active');
             } else {
-                if (dislikeButton.classList.contains('active')) {
-                    dislikeButton.classList.remove('active');
-                } else {
-                    dislikeButton.classList.add('active');
-                    likeButton.classList.remove('active');
-                }
+                dislikeButton.classList.toggle('active');
+                likeButton.classList.remove('active');
             }
         } else {
             console.error(`Error: ${response.statusText}`);
@@ -115,3 +119,4 @@ async function rateCorrect(id, correctness) {
         console.error('Error:', error);
     }
 }
+
