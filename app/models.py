@@ -4,6 +4,7 @@ from django.db.models import Sum, F, Count, Case, When, IntegerField, Q
 from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.postgres.search import SearchVector, SearchQuery
 
 class QuestionLike(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE, db_index=True)
@@ -21,6 +22,11 @@ class AnswerLike(models.Model):
         unique_together = ('answer', 'user')
 
 class QuestionManager(models.Manager):
+    def search_questions(query):
+        search_vector = SearchVector('title', 'text')
+        search_query = SearchQuery(query)
+
+        return Question.objects.annotate(search=search_vector).filter(search=search_query)
     def get_new(self):
         return super().get_queryset().order_by('-date')
     

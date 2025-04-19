@@ -13,6 +13,7 @@ from app.forms import *
 from django.views.decorators.http import require_POST
 
 from django.contrib.postgres.search import SearchVector, SearchQuery
+import re
 
 def index(request):
     QUESTIONS = Question.objects.get_new()
@@ -264,18 +265,27 @@ def rate_correct(request, answer_id):
     answer.save()
     return JsonResponse({'answer_correctness': answer.correctness})
 
-def search_questions(query):
-    search_vector = SearchVector('title', 'text')
-    search_query = SearchQuery(query)
 
-    return Question.objects.annotate(search=search_vector).filter(search=search_query)
 
 def search_view(request):
     query = request.GET.get('query', '')
     results = []
-    
+
     if query:
-        search_results = search_questions(query)
-        results = [{'title': result.title, 'id': result.id} for result in search_results][:10]
-    
+        search_results = Question.objects.search_questions(query)
+        for result in search_results:
+            match = re.search(r'.{0,50}(' + re.escape(query) + r').{0,50}', result.text, re.IGNORECASE)
+            if match:
+                context_snippet = match.group(0)
+            else:
+                context_snippet = result.text[:100]
+
+            results.append({
+                'title': result.title,
+                'text': context_snippet,
+                'id': result.id
+            })
+
+        results = results[:10]
+
     return JsonResponse({'results': results})

@@ -129,7 +129,11 @@
             data.results.forEach(item => {
                 const resultItem = document.createElement('div');
                 resultItem.classList.add('search-result-item');
-                resultItem.innerHTML = `<a href="/question/${item.id}/">${item.title}</a>`;
+                resultItem.innerHTML = `
+                <a href="/question/${item.id}/">
+                    <strong>${item.title}</strong>
+                    <span style="display:block; color:gray; font-size:small;">${item.text}</span>
+                </a>`;
                 resultsContainer.appendChild(resultItem);
             });
         }
